@@ -19,7 +19,7 @@ $ npm run dev
 
 - `npm run build`: build with HTML/CSS/JS minification.
 
-### 参考
+### Reference
 
 [播种前端-vue统一目录结构](http://blog.work.bzdev.net/2018/03/30/vue-directory-structure/#more)
 
