@@ -1,0 +1,9 @@
+{
+  "presets": [
+    ["env", { "modules": false }],
+    "stage-3"
+  ],
+  "plugins": [
+    "syntax-dynamic-import"  // 非头尾部可引用import()
+  ]
+}

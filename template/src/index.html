@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+  <title>test</title>
+  <script>  
+    // rem
+    // (function(scope){
+    //   // 下面750对应设计稿的宽度
+    //   // document.body.innerHTML = window.innerWidth;
+    //   var ua = navigator.userAgent.toLocaleLowerCase();
+    //   var eventName = 'onorientationchange' in scope ? 'orientationchange' : 'resize';
+    //   var howLong = /chrome|firefox|ucbrowser|mqqbrowser/.test(ua) || (/safari/.test(ua) && /iphone/.test(ua)) ? 0 : 300;
+    //   // app打开浏览窗体时可能第一时间无法获取浏览器宽度, 需循环
+    //   var loop = function() {
+		//     var winWidth = document.documentElement && document.documentElement.clientWidth ? document.documentElement.clientWidth : (window.screen ? window.screen.width : 0);
+    //     var docWidth = window.innerWidth;
+    //     // 宽度获取不成功延时执行
+    //     if (!winWidth && !docWidth) return setTimeout(function() {
+    //       loop();
+    //     }, 100);
+    //     var _width = !docWidth || (winWidth && winWidth < docWidth) ? winWidth : docWidth; // 兼容部分奇怪的安卓机
+    //     document.documentElement.style.fontSize = (_width / 750 * 40) + 'px';
+    //     scope.addEventListener(eventName, function(){
+    //       clearTimeout(scope.orientationChangedTimeout);
+    //       scope.orientationChangedTimeout = setTimeout(function(){
+    //         document.documentElement.style.fontSize = (_width / 750 * 40) + 'px';
+    //       }, howLong);
+    //     }, false);
+    //   };
+    //   loop();
+    // }(window));
+    {{#redirected}}// 重定向后css/js需绝对路径引入
+    var url = window.location.href;
+    var env = /(localhost|fe.office.bzdev.net\/moekit\/)/.test(url) ? 'dev' : 'product';
+    
+    if (env === 'product') {
+      var matched = url.match(/\/\/(\w*).([\w.]*)(\/\w*\/\w*)?/);
+      var domain = '';
+      if (/bozhong.com/.test(matched[0])) {
+        domain = '//scdn.bozhong.com/source';
+      } else if (/fe.office.bzdev.net/.test(matched[0])) {
+        domain = '//fe.' + matched[2] + matched[3];
+      } else {
+        domain = '//source.' + matched[2];
+      }
+
+      var baseHref = document.createElement('base');
+      // 按项目路径修改basehref路径_filePath，如activity/health，_filepath改成'/activity/health/'
+      baseHref.href = domain + '/_filePath/';
+
+      document.head.appendChild(baseHref);
+    }{{/redirected}}
+  </script>
+</head>
+<body>
+  <div id="app">
+  </div>{{#redirected}}
+  <script type="text/javascript">
+    if (env === 'product') {
+      var files = <%=JSON.stringify(htmlWebpackPlugin.files.js)%>;
+      var queueIndex = 0;
+      function loadScript (src, next) {
+        var script = document.createElement('script');
+        script.src = src;
+        document.body.appendChild(script);
+        script.onload = function () {
+          if (next) {
+            next();
+          }
+        };
+      }
+      function loadScriptLoop () {
+        loadScript(files[queueIndex], function () {
+          queueIndex += 1;
+          if (queueIndex < files.length) {
+            loadScriptLoop();
+          }
+        });
+      }
+      loadScriptLoop();
+    }
+  </script>{{/redirected}}
+</body>
+</html>
