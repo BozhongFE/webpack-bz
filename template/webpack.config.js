@@ -1,7 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;{{#htmlwebpackPlugin}}
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const address = require('address');{{#htmlwebpackPlugin}}
 const HtmlWebpackPlugin = require('html-webpack-plugin');{{/htmlwebpackPlugin}}{{#less}}
 const autoprefixer = require('autoprefixer');{{/less}}{{#source}}
 const fs = require('fs');
@@ -15,6 +16,15 @@ if (typeof sourcePath === 'undefined') {
 } else if (!fs.existsSync(sourcePath)) {
   throw new Error('source根目录不存在，请检查配置的source根目录是否正确');
 }{{/source}}
+
+// 获取ip
+const getAddressIP = () => {
+  let lanUrlForConfig = address.ip();
+  if (!/^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(lanUrlForConfig)) {
+    lanUrlForConfig = undefined;
+  }
+  return lanUrlForConfig;
+}
 
 module.exports = { {{#if_eq htmlwebpackPlugin false}}
   entry: './src/main.js',{{/if_eq}}{{#htmlwebpackPlugin}}
@@ -90,7 +100,9 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
   devServer: {
     historyApiFallback: true,
     noInfo: true,
-    overlay: true
+    overlay: true,
+    host: getAddressIP() || '0.0.0.0',
+    port: 8000
   },
   performance: {
     hints: false
