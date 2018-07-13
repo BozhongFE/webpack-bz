@@ -7,7 +7,7 @@ This is a project template.
 ``` bash
 $ npm install -g vue-cli
 $ vue init BozhongFE/webpack-bz my-project
-// or $ vue init BozhongFE/webpack-bz#v0.1.0 my-project
+// or $ vue init BozhongFE/webpack-bz#v0.2.0 my-project
 $ cd my-project
 $ npm install
 $ npm run dev
