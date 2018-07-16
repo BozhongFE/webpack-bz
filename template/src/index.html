@@ -33,7 +33,9 @@
     // }(window));
     {{#redirected}}// 重定向后css/js需绝对路径引入
     var url = window.location.href;
-    var env = /(localhost|fe.office.bzdev.net\/moekit\/)/.test(url) ? 'dev' : 'product';
+    // chunks默认注入判断为开发环境或不需要重定向
+    var env = /(localhost|fe.office.bzdev.net\/moekit\/)/.test(url) || 
+      <%=Boolean(htmlWebpackPlugin.options.inject && htmlWebpackPlugin.options.chunks.length)%> ? 'dev' : 'product';
     
     if (env === 'product') {
       var matched = url.match(/\/\/(\w*).([\w.]*)(\/\w*\/\w*)?/);
