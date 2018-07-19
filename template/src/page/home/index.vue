@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <!-- html内引入资源带~ -->
-    <img src="~src/assets/images/logo.png">
+    <img src="~src/assets/img/logo.png">
     <h1>\{{ msg }}</h1>{{#router}}
     <home-nav></home-nav>{{/router}}
   </div>

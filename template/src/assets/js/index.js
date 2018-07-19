@@ -4,7 +4,7 @@
 * fmt: string 时间格式
 * new Date().Format('hh:mm'); // --> 16:01
 */
-Date.prototype.Format = (fmt) => {
+Date.prototype.Format = function (fmt) {
   const date = this;
   const week = ['日', '一', '二', '三', '四', '五', '六'];
   const month = '一 二 三 四 五 六 七 八 九 十 十一 十二'.split(' ');
@@ -29,4 +29,3 @@ Date.prototype.Format = (fmt) => {
   }
   return resultText;
 };
-
