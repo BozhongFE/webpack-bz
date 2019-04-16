@@ -102,7 +102,8 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
     noInfo: true,
     overlay: true,
     host: getAddressIP() || '0.0.0.0',
-    port: 8000
+    port: 8000,
+    disableHostCheck: true,
   },
   performance: {
     hints: false
