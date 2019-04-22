@@ -27,7 +27,7 @@ class CopyShareImg {
       
       fs.exists(path.resolve(__dirname, './src/assets/img/share'), (exists) => {
         if (!exists) return console.log('分享源图目录不存在');
-        shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath, './share'));
+        shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath));
         console.log(`分享图已复制到${path.resolve(outputPath, './share')}`);
       });
     });
