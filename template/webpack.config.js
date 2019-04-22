@@ -5,6 +5,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const address = require('address');{{#htmlwebpackPlugin}}
 const HtmlWebpackPlugin = require('html-webpack-plugin');{{/htmlwebpackPlugin}}{{#less}}
 const autoprefixer = require('autoprefixer');{{/less}}{{#source}}
+const shell = require('shelljs');
 const fs = require('fs');
 
 const sourcePath = process.env.npm_config_source;
@@ -15,7 +16,23 @@ if (typeof sourcePath === 'undefined') {
   throw new Error('没有配置模块路径');
 } else if (!fs.existsSync(sourcePath)) {
   throw new Error('source根目录不存在，请检查配置的source根目录是否正确');
-}{{/source}}
+}
+// 按项目路径修改打包输出的路径_filePath，如activity/health，_filepath改成'./activity/health'
+const outputPath = path.resolve(sourcePath, '_filePath');
+// 将分享图复制到输出目录
+class CopyShareImg {
+  apply(compiler) {
+    compiler.plugin('after-emit', (compilation, callback) => {
+      console.log('开始将分享图复制到输出目录');
+      
+      fs.exists(path.resolve(__dirname, './src/assets/img/share'), (exists) => {
+        if (!exists) return console.log('分享源图目录不存在');
+        shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath, './share'));
+        console.log(`分享图已复制到${path.resolve(outputPath, './share')}`);
+      });
+    });
+  }
+};{{/source}}
 
 // 获取ip
 const getAddressIP = () => {
@@ -34,11 +51,13 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
   },{{/htmlwebpackPlugin}}
   output: { {{#source}}
     // 按项目路径修改打包输出的路径_filePath，如activity/health，_filepath改成'./activity/health'
-    path: path.resolve(sourcePath, '_filePath'),{{/source}}{{#if_eq source false}}
+    path: outputPath,{{/source}}
+    {{#if_eq source false}}
     path: path.resolve(__dirname, './dist'),
     {{/if_eq}}{{#if_eq htmlwebpackPlugin false}}publicPath: '/dist/',
     filename: 'build.js',
-    {{/if_eq}}{{#htmlwebpackPlugin}}filename: process.env.NODE_ENV === 'production' ? '[name].js?[chunkhash]' : '[name].js',
+    {{/if_eq}}{{#htmlwebpackPlugin}}
+    filename: process.env.NODE_ENV === 'production' ? '[name].js?[chunkhash]' : '[name].js',
     {{/htmlwebpackPlugin}}chunkFilename: '[id].js?[chunkhash]',
   },
   module: {
@@ -121,6 +140,8 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
       filename: 'index.html',
       template: 'src/index.html',
       chunks: ['main', 'manifest', 'vendor'],
+      bzConfigPath: 'https://scdn.bozhong.com/source/common/js/config.js',
+      nodeEnv: process.env.NODE_ENV,
     }),{{/if_eq}}
   ]{{/htmlwebpackPlugin}}
 }
@@ -134,13 +155,20 @@ if (process.env.NODE_ENV !== 'production') {
       template: 'src/index.html',
       chunks: ['main', 'manifest', 'vendor'],
       chunksSortMode: 'dependency',
+      bzConfigPath: 'https://source.office.bzdev.net/common/js/config.js',
+      nodeEnv: process.env.NODE_ENV,
     }),
     {{/if_and}}
   ])
 }
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map',
+  {{#source}}
+  fs.exists(path.resolve(__dirname, './src/assets/img/share'), (exists) => {
+    if (!exists) return false;
+    shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath, '/share'));
+  });{{/source}}
+  module.exports.devtool = '#source-map';
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
@@ -165,7 +193,12 @@ if (process.env.NODE_ENV === 'production') {
       chunks: ['main', 'manifest', 'vendor'],
       chunksSortMode: 'dependency',
       inject: false,
+      nodeEnv: process.env.NODE_ENV,
+      {{#source}}bzConfigPath: '../../common/js/config.js',{{/source}}
+      {{#if_eq source false}}bzConfigPath: 'https://scdn.bozhong.com/source/common/js/config.js',{{/if_eq}}
     }),
     {{/if_and}}
+    {{#source}}
+    new CopyShareImg(),{{/source}}
   ])
 }

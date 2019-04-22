@@ -13,6 +13,11 @@ $ npm install
 $ npm run dev
 ```
 
+### 分享图复制
+
+打包到source的项目：src/img/share目录下的图片将自动复制到对应目录下
+
+
 ### What's Included
 
 - `npm run dev`: Webpack + `vue-loader` with proper config for source maps & hot-reload.
@@ -31,3 +36,4 @@ $ npm run dev
 |#|v0.2.0|20180713| 开发环境自动匹配本机ip，port写定8000
 |#|v0.2.0|20180716| 修正重定向项目用ip访问被判断为生产环境bug
 |#|v0.2.1|20180719| 内置函数bug修复/静态图片文件夹名调整
+|#|v0.3.1|20190422| 新增分享图自动复制/bzConfig引入/打包的静态html去掉多余代码

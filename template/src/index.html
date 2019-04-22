@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-  <title>test</title>
+  <title>{{ name }}</title>
   <script>  
     // rem
     // (function(scope){
@@ -32,57 +32,61 @@
     //   loop();
     // }(window));
     {{#redirected}}// 重定向后css/js需绝对路径引入
-    var url = window.location.href;
     // chunks默认注入判断为开发环境或不需要重定向
-    var env = /(localhost|fe.office.bzdev.net\/moekit\/)/.test(url) || 
-      <%=Boolean(htmlWebpackPlugin.options.inject && htmlWebpackPlugin.options.chunks.length)%> ? 'dev' : 'product';
+    <% const env = htmlWebpackPlugin.options.nodeEnv === 'development' || (htmlWebpackPlugin.options.inject && htmlWebpackPlugin.options.chunks.length) ? 'dev' : 'product'; %>;
     
-    if (env === 'product') {
-      var matched = url.match(/\/\/(\w*).([\w.]*)(\/\w*\/\w*)?/);
-      var domain = '';
-      if (/bozhong.com/.test(matched[0])) {
-        domain = '//scdn.bozhong.com/source';
-      } else if (/fe.office.bzdev.net/.test(matched[0])) {
-        domain = '//fe.' + matched[2] + matched[3];
-      } else {
-        domain = '//source.' + matched[2];
-      }
+    <% if (env === 'dev') { %>
+    // 此处script仅开发时出现
+    const script = document.createElement('script');
+    script.src = '<%=htmlWebpackPlugin.options.bzConfigPath%>';
+    document.head.appendChild(script);
+    <% } else { %> 
+    var matched = window.location.href.match(/\/\/(\w*).([\w.]*)(\/\w*\/\w*)?/);
+    var domain = '';
+    if (/bozhong.com/.test(matched[0])) {
+      domain = '//scdn.bozhong.com/source';
+    } else if (/fe.office.bzdev.net/.test(matched[0])) {
+      domain = '//fe.' + matched[2] + matched[3];
+    } else {
+      domain = '//source.' + matched[2];
+    }
 
-      var baseHref = document.createElement('base');
-      // 按项目路径修改basehref路径_filePath，如activity/health，_filepath改成'/activity/health/'
-      baseHref.href = domain + '/_filePath/';
+    var baseHref = document.createElement('base');
+    // 按项目路径修改basehref路径_filePath，如activity/health，_filepath改成'/activity/health/'
+    baseHref.href = domain + '/_filePath/';
 
-      document.head.appendChild(baseHref);
-    }{{/redirected}}
-  </script>
+    document.head.appendChild(baseHref);
+    <% } %>{{/redirected}}
+  </script>{{#if_eq redirected false}}
+  <script src="<%=htmlWebpackPlugin.options.bzConfigPath%>"></script>{{/if_eq}}
 </head>
 <body>
   <div id="app">
   </div>{{#redirected}}
+  <% if (env !== 'dev') { %>
   <script type="text/javascript">
-    if (env === 'product') {
-      var files = <%=JSON.stringify(htmlWebpackPlugin.files.js)%>;
-      var queueIndex = 0;
-      function loadScript (src, next) {
-        var script = document.createElement('script');
-        script.src = src;
-        document.body.appendChild(script);
-        script.onload = function () {
-          if (next) {
-            next();
-          }
-        };
-      }
-      function loadScriptLoop () {
-        loadScript(files[queueIndex], function () {
-          queueIndex += 1;
-          if (queueIndex < files.length) {
-            loadScriptLoop();
-          }
-        });
-      }
-      loadScriptLoop();
+    var files = <%=JSON.stringify([htmlWebpackPlugin.options.bzConfigPath, ...htmlWebpackPlugin.files.js])%>;
+    var queueIndex = 0;
+    function loadScript (src, next) {
+      var script = document.createElement('script');
+      script.src = src;
+      document.body.appendChild(script);
+      script.onload = function () {
+        if (next) {
+          next();
+        }
+      };
     }
-  </script>{{/redirected}}
+    function loadScriptLoop () {
+      loadScript(files[queueIndex], function () {
+        queueIndex += 1;
+        if (queueIndex < files.length) {
+          loadScriptLoop();
+        }
+      });
+    }
+    loadScriptLoop();
+  </script>
+  <% } %>{{/redirected}}
 </body>
 </html>
