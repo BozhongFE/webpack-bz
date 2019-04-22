@@ -163,11 +163,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  {{#source}}
-  fs.exists(path.resolve(__dirname, './src/assets/img/share'), (exists) => {
-    if (!exists) return false;
-    shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath, '/share'));
-  });{{/source}}
   module.exports.devtool = '#source-map';
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
