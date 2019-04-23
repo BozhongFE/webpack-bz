@@ -22,7 +22,7 @@ const outputPath = path.resolve(sourcePath, '_filePath');
 // 将分享图复制到输出目录
 class CopyShareImg {
   apply(compiler) {
-    compiler.plugin('after-emit', (compilation, callback) => {
+    compiler.plugin('done', (compilation, callback) => {
       console.log('开始将分享图复制到输出目录');
       
       fs.exists(path.resolve(__dirname, './src/assets/img/share'), (exists) => {
@@ -30,6 +30,8 @@ class CopyShareImg {
         shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath));
         console.log(`分享图已复制到${path.resolve(outputPath, './share')}`);
       });
+      
+      return callback && callback;
     });
   }
 };{{/source}}
