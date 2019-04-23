@@ -50,7 +50,6 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
     vendor: './src/vendor.js'
   },{{/htmlwebpackPlugin}}
   output: { {{#source}}
-    // 按项目路径修改打包输出的路径_filePath，如activity/health，_filepath改成'./activity/health'
     path: outputPath,{{/source}}
     {{#if_eq source false}}
     path: path.resolve(__dirname, './dist'),
@@ -163,7 +162,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  module.exports.devtool = '#source-map';
+  module.exports.devtool = false;
   // http://vue-loader.vuejs.org/en/workflow/production.html
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
