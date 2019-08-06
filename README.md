@@ -15,7 +15,7 @@ $ npm run dev
 
 ### 分享图复制
 
-打包到source的项目：src/img/share目录下的图片将自动复制到对应目录下
+打包到source的项目：assets/img/share目录下的图片将自动复制到对应目录下
 
 
 ### What's Included
@@ -38,3 +38,27 @@ $ npm run dev
 |#|v0.2.1|20180719| 内置函数bug修复/静态图片文件夹名调整
 |#|v0.3.0|20190422| 新增分享图自动复制/bzConfig引入/打包的静态html去掉多余代码
 |#|v0.3.1|20190423| 去除打包后的sourceMap/修复插件CopyShareImg对BundleAnalyzerPlugin的影响
+|#|v0.4.0|20190806| 新增 vue-routers history 模式，优化动态加载 js 的脚本
+
+
+### Vue-Router History Mode
+
+当前域名启用 history mode
+
+```conf
+# source.xxx.com
+location /activity/wiki/ {
+  try_files $uri $uri/ /activity/wiki/index.html;
+}
+```
+
+代理跨域名，除了需要配置上面的，还需要再另外的域名配置下面，如：
+
+```conf
+# m.xxxx.com
+location ^~ /wiki/ {
+  proxy_set_header Host source.xxxx.com;
+  include proxy_params;
+  proxy_pass https://127.0.0.1/activity/wiki/;
+}
+```

@@ -55,9 +55,15 @@ module.exports = {
       default: false
     },
     htmlwebpackPlugin: {
-       type: 'confirm',
-       message: 'Use html-webpack-plugin?',
-       default: false
+      type: 'confirm',
+      message: 'Use html-webpack-plugin?',
+      default: false
+    },
+    routerHistory: {
+      when: 'router && htmlwebpackPlugin',
+      type: 'confirm',
+      message: 'Use vue-router history mode?',
+      default: false
     },
     redirected: {
       when: 'htmlwebpackPlugin',
@@ -76,20 +82,23 @@ module.exports = {
     'index.html': '!htmlwebpackPlugin',
     'src/vuex/**/*': 'vuex',
     'src/router/**/*': 'router',
+    'src/router/history.js': 'htmlwebpackPlugin && routerHistory',
     'src/page/404.vue': 'router',
     'src/page/sitemap.vue': 'router',
     'src/page/home/components/nav.vue': 'router',
     'src/vendor.js': 'htmlwebpackPlugin',
+    'bz.config.js': 'source || (htmlwebpackPlugin && routerHistory)',
   },
   complete(data) {
     let tips = '';
     if (data.inPlace) {
       tips += '\n   To get started:\n\n     npm install\n     npm run dev';
     } else {
-      tips += `\n   To get started:\n\n     cd ${data.destDirName}\n     npm install\n     npm run dev`
+      tips += `\n   To get started:\n\n     cd ${data.destDirName}\n     npm install\n     npm run dev\n`
     }
-    if (data.source) tips += '\n     check ./webpack.config.js output.path';
-    if (data.redirected) tips += '\n     check ./src/index.html baseHref.href';
+    if (data.source) tips += '\n     check ./bz.config.js projectPath';
+    if (data.routerHistory) tips += '\n     check ./bz.config.js publicPath';
+    if (data.source) tips += '\n     wechat share img: ./assets/img/share/xxx';
     
     console.log(tips)
   }

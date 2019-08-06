@@ -4,46 +4,17 @@ const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const address = require('address');{{#htmlwebpackPlugin}}
 const HtmlWebpackPlugin = require('html-webpack-plugin');{{/htmlwebpackPlugin}}{{#less}}
-const autoprefixer = require('autoprefixer');{{/less}}{{#source}}
-const shell = require('shelljs');
-const fs = require('fs');
+const autoprefixer = require('autoprefixer');{{/less}}{{#if_or routerHistory source}}
+const { {{#routerHistory}}publicPath{{/routerHistory}}{{#if_and routerHistory source}}, {{/if_and}}{{#source}}projectPath, outputPath, CopyShareImg{{/source}} } = require('./bz.config');{{/if_or}}
 
-const sourcePath = process.env.npm_config_source;
-
-if (typeof sourcePath === 'undefined') {
-  console.log('请先配置打包输出的source根目录');
-  console.log('Example: npm config set source "D:\\source"');
-  throw new Error('没有配置模块路径');
-} else if (!fs.existsSync(sourcePath)) {
-  throw new Error('source根目录不存在，请检查配置的source根目录是否正确');
-}
-// 按项目路径修改打包输出的路径_filePath，如activity/health，_filepath改成'./activity/health'
-const outputPath = path.resolve(sourcePath, '_filePath');
-// 将分享图复制到输出目录
-class CopyShareImg {
-  apply(compiler) {
-    compiler.plugin('done', (compilation, callback) => {
-      console.log('开始将分享图复制到输出目录');
-      
-      fs.exists(path.resolve(__dirname, './src/assets/img/share'), (exists) => {
-        if (!exists) return console.log('分享源图目录不存在');
-        shell.cp('-R', path.resolve(__dirname, './src/assets/img/share'), path.resolve(outputPath));
-        console.log(`分享图已复制到${path.resolve(outputPath, './share')}`);
-      });
-      
-      return callback && callback;
-    });
-  }
-};{{/source}}
-
-// 获取ip
+/**
+ * 获取 ip
+ */
 const getAddressIP = () => {
-  let lanUrlForConfig = address.ip();
-  if (!/^10[.]|^172[.](1[6-9]|2[0-9]|3[0-1])[.]|^192[.]168[.]/.test(lanUrlForConfig)) {
-    lanUrlForConfig = undefined;
-  }
-  return lanUrlForConfig;
-}
+  const ip = address.ip();
+  if (/192(\.[0-9]{1,3}){3}/.test(ip)) return ip;
+  return address.ip('以太网') || ip;
+};
 
 module.exports = { {{#if_eq htmlwebpackPlugin false}}
   entry: './src/main.js',{{/if_eq}}{{#htmlwebpackPlugin}}
@@ -52,12 +23,12 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
     vendor: './src/vendor.js'
   },{{/htmlwebpackPlugin}}
   output: { {{#source}}
-    path: outputPath,{{/source}}
-    {{#if_eq source false}}
-    path: path.resolve(__dirname, './dist'),
-    {{/if_eq}}{{#if_eq htmlwebpackPlugin false}}publicPath: '/dist/',
+    path: outputPath,{{/source}} {{#if_eq source false}}
+    path: path.resolve(__dirname, './dist'),{{/if_eq}}{{#if_eq htmlwebpackPlugin false}}
+    publicPath: '/dist/',
     filename: 'build.js',
     {{/if_eq}}{{#htmlwebpackPlugin}}
+    publicPath: process.env.NODE_ENV === 'production' ? projectPath : undefined,
     filename: process.env.NODE_ENV === 'production' ? '[name].js?[chunkhash]' : '[name].js',
     {{/htmlwebpackPlugin}}chunkFilename: '[id].js?[chunkhash]',
   },
@@ -105,7 +76,7 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
         loader: 'url-loader',
         options: {
           limit: 12 * 1024,
-          name: './images/[name].[ext]?[hash]',
+          name: './img/[name].[ext]?[hash]',
         },
       },
     ],
@@ -128,8 +99,8 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
   performance: {
     hints: false
   },
-  devtool: '#eval-source-map',{{#htmlwebpackPlugin}}
-  plugins: [
+  devtool: '#eval-source-map',
+  plugins: [{{#htmlwebpackPlugin}}
     new webpack.optimize.CommonsChunkPlugin({
       names: ['vendor'],
     }),
@@ -141,10 +112,17 @@ module.exports = { {{#if_eq htmlwebpackPlugin false}}
       filename: 'index.html',
       template: 'src/index.html',
       chunks: ['main', 'manifest', 'vendor'],
-      bzConfigPath: 'https://scdn.bozhong.com/source/common/js/config.js',
+      bzConfigPath: '/common/js/config.js',
       nodeEnv: process.env.NODE_ENV,
-    }),{{/if_eq}}
-  ]{{/htmlwebpackPlugin}}
+      inject: false,
+      projectPath,
+    }),{{/if_eq}}{{/htmlwebpackPlugin}}{{#routerHistory}}
+    new webpack.DefinePlugin({
+      publicPath: JSON.stringify(publicPath),
+      projectPath: JSON.stringify(projectPath),
+    }),
+    {{/routerHistory}}
+  ]
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -158,6 +136,8 @@ if (process.env.NODE_ENV !== 'production') {
       chunksSortMode: 'dependency',
       bzConfigPath: 'https://source.office.bzdev.net/common/js/config.js',
       nodeEnv: process.env.NODE_ENV,
+      inject: false,{{#source}}
+      projectPath,{{/source}}
     }),
     {{/if_and}}
   ])
@@ -189,9 +169,9 @@ if (process.env.NODE_ENV === 'production') {
       chunks: ['main', 'manifest', 'vendor'],
       chunksSortMode: 'dependency',
       inject: false,
-      nodeEnv: process.env.NODE_ENV,
-      {{#source}}bzConfigPath: '../../common/js/config.js',{{/source}}
-      {{#if_eq source false}}bzConfigPath: 'https://scdn.bozhong.com/source/common/js/config.js',{{/if_eq}}
+      nodeEnv: process.env.NODE_ENV,{{#source}}
+      projectPath,
+      bzConfigPath: '/common/js/config.js',{{/source}}
     }),
     {{/if_and}}
     {{#source}}

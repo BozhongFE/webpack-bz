@@ -24,6 +24,16 @@ export default [
     },
   },
   {
+    path: '/first/second',
+    name: 'first-second',
+    component: {
+      template: '<div>测试路由，可以删除</div>'
+    },
+    meta: {
+      title: '测试路由',
+    },
+  },
+  {
     path: '/index',
     redirect: '/',
   },

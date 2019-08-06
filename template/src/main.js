@@ -1,3 +1,4 @@
+{{#if_or routerHistory redirected}}__webpack_public_path__ = projectFullPath;{{/if_or}}
 import 'es6-promise/auto';
 import Vue from 'vue';
 import App from './App.vue';{{#router}}
