@@ -3,8 +3,8 @@ const { resolve } = require('path');
 const assert = require('assert');
 const shell = require('shelljs');
 
-const publicPath = '/cropper/';
-const projectPath = '/cropper/';
+const publicPath = '';
+const projectPath = '';
 const sourcePath = process.env.npm_config_source;
 const outputPath = resolve(sourcePath, `.${projectPath}`);
 // exp: publicPath = '/wiki/' projectPath = '/activity/wiki/'
@@ -27,7 +27,7 @@ class CopyShareImg {
       console.log('开始将分享图复制到输出目录');
       const shareExists =  existsSync(resolve(__dirname, './src/assets/img/share'));
       if (!shareExists) {
-        return console.log('分享源图目录不存在', 'assets/img/share/');
+        return console.log('分享源图目录不存在', './src/assets/img/share/');
       }
       shell.cp('-R', resolve(__dirname, './src/assets/img/share'), resolve(outputPath));
       console.log(`分享图已复制到${resolve(outputPath, './share')}`);
@@ -36,8 +36,8 @@ class CopyShareImg {
   }
 };
 module.exports = {
-  publicPath,
-  projectPath,{{#source}}
+  publicPath,{{#source}}
+  projectPath,
   CopyShareImg,
   outputPath,{{/source}}
 };

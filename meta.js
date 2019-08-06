@@ -98,7 +98,7 @@ module.exports = {
     }
     if (data.source) tips += '\n     check ./bz.config.js projectPath';
     if (data.routerHistory) tips += '\n     check ./bz.config.js publicPath';
-    if (data.source) tips += '\n     wechat share img: ./assets/img/share/xxx';
+    if (data.source) tips += '\n     wechat share img: ./src/assets/img/share/xxx';
     
     console.log(tips)
   }
