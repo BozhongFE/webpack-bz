@@ -1,3 +1,4 @@
+# vue-cli@3 请前往 [bz-cli vue](https://github.com/BozhongFE/bz-cli/wiki/bz-vue)
 # BozhongFE/webpack-bz
 
 ### Usage
