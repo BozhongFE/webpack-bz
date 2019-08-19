@@ -40,6 +40,7 @@ $ npm run dev
 |#|v0.3.0|20190422| 新增分享图自动复制/bzConfig引入/打包的静态html去掉多余代码
 |#|v0.3.1|20190423| 去除打包后的sourceMap/修复插件CopyShareImg对BundleAnalyzerPlugin的影响
 |#|v0.4.0|20190806| 新增 vue-routers history 模式，优化动态加载 js 的脚本
+|#|v0.4.1|20190819| 更新 less 版本为3.9.0（fix Class constructor FileManager cannot be invoked without 'new'）
 
 
 ### Vue-Router History Mode
